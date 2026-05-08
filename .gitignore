@@ -1,0 +1,16 @@
+target/
+build/
+nbproject/private/
+nb-configuration.xml
+*.class
+*.log
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
