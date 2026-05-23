@@ -1,90 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Vigilant Curator | Surveillance Incident System</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/styles.css"/>
-</head>
-<body>
-
-<!-- SIDEBAR -->
-<aside class="sidebar bg-dark text-white d-flex flex-column shadow">
-    <div class="p-4">
-        <h5 class="fw-bold mb-0">Vigilant Curator</h5>
-        <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 2px; font-size: 0.7rem;">Elite Monitoring</small>
-    </div>
-    <ul class="nav nav-pills flex-column mb-auto px-3 gap-1">
-        <li class="nav-item">
-            <a href="#" class="nav-link text-white active bg-primary bg-opacity-25 d-flex align-items-center gap-3">
-                <span class="material-symbols-outlined">dashboard</span> Dashboard
-            </a>
-        </li>
-        <li>
-            <a href="/incidencias" class="nav-link text-white opacity-75 d-flex align-items-center gap-3">
-                <span class="material-symbols-outlined">warning</span> Incidents
-            </a>
-        </li>
-        <li>
-            <a href="/reportes" class="nav-link text-white opacity-75 d-flex align-items-center gap-3">
-                <span class="material-symbols-outlined">assessment</span> Reports
-            </a>
-        </li>
-        <li>
-            <a href="/camaras" class="nav-link text-white opacity-75 d-flex align-items-center gap-3">
-                <span class="material-symbols-outlined">videocam</span> Cameras
-            </a>
-        </li>
-    </ul>
-    
-    <div class="p-4 mt-auto border-top border-secondary">
-        <a href="#" class="text-white text-decoration-none opacity-75 d-flex align-items-center gap-2 mb-2" style="font-size: 0.9rem;">
-            <span class="material-symbols-outlined fs-6">settings</span> Settings
-        </a>
-        <a href="#" class="text-white text-decoration-none opacity-75 d-flex align-items-center gap-2 mb-4" style="font-size: 0.9rem;">
-            <span class="material-symbols-outlined fs-6">help</span> Support
-        </a>
-        
-        <div class="d-flex align-items-center gap-3 bg-secondary bg-opacity-25 p-2 rounded">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5-_1b5Tqt5H2DysZVEnx-YAKlBAoIgRYlcgCfaYJM6xUfDsvQ8yZ0of4PRll3jf2RP63tJdKy53i6VnJ6qPxRda-fAmkcMK3xwpzqcWiz4wWsLIhtC7znHkjMxhGZ0eASKCdPppzfg9luBikp0cXaEXYG2l15HCGqecxLzWnuAgiYFEe1u7ZrHvHt3ig6W2AxLQoJMfTRIVPPzBHPvcBWRF8lgydpYipniIU36CmNb8DVodCWej3fZveis2GHoKF4nAd9oHh72g" alt="User" class="rounded-circle" width="32" height="32" style="object-fit: cover;">
-            <div>
-                <div class="fw-bold" style="font-size: 0.85rem;">Admin User</div>
-                <div class="text-secondary" style="font-size: 0.7rem;">Tier 1 Monitor</div>
-            </div>
-        </div>
-    </div>
-</aside>
-
-<!-- HEADER -->
-<header class="top-header border-bottom d-flex align-items-center justify-content-between px-4">
-    <div class="d-flex align-items-center gap-4">
-        <h5 class="fw-bolder text-dark mb-0 d-none d-md-block">Surveillance Incident System</h5>
-        <div class="position-relative">
-            <span class="material-symbols-outlined position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 1.1rem;">search</span>
-            <input type="text" class="form-control form-control-sm ps-4 rounded-pill bg-light border-0" placeholder="Search records..." style="width: 250px;">
-        </div>
-    </div>
-    <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">notifications</span></button>
-        <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">account_circle</span></button>
-        <button class="btn btn-dark btn-sm d-flex align-items-center gap-2 ms-2 rounded-3 fw-semibold">
-            <span class="material-symbols-outlined fs-6">add_circle</span> New Record
-        </button>
-    </div>
-</header>
-
 <!-- MAIN CONTENT -->
-<main class="main-content p-4">
+<main class="main-content p-4 w-100">
     <div class="container-fluid max-w-7xl">
         
         <!-- Stats Row -->
@@ -280,8 +196,3 @@
 
     </div>
 </main>
-
-<!-- Bootstrap 5 JS Bundle (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
