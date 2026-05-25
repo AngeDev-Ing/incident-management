@@ -10,4 +10,5 @@ public interface IncidenciaRepository extends JpaRepository<Incidencia, Long> {
     long countByType(String type);
     List<Incidencia> findTop3ByOrderByIdDesc();
     List<Incidencia> findAllByOrderByIdDesc();
+    List<Incidencia> findByTitleContainingIgnoreCase(String query);
 }
