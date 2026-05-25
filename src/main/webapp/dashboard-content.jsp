@@ -22,7 +22,7 @@
                     <div class="card-body d-flex flex-column justify-content-between">
                         <span class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Tiempo en Línea</span>
                         <div class="mt-2 d-flex align-items-baseline gap-2">
-                            <span class="fs-2 fw-bold text-dark">99.9%</span>
+                            <span class="fs-2 fw-bold text-dark">${uptimePercentage}</span>
                         </div>
                     </div>
                 </div>
@@ -32,8 +32,8 @@
                     <div class="card-body d-flex flex-column justify-content-between">
                         <span class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">T. Prom. Respuesta</span>
                         <div class="mt-2 d-flex align-items-baseline gap-2">
-                            <span class="fs-2 fw-bold text-dark">4m</span>
-                            <span class="text-secondary fw-bold" style="font-size: 0.75rem;">-30s</span>
+                            <span class="fs-2 fw-bold text-dark">${tiempoPromedio}</span>
+                            <span class="${tendenciaColor} fw-bold" style="font-size: 0.75rem;">${tendenciaRespuesta}</span>
                         </div>
                     </div>
                 </div>
@@ -44,8 +44,16 @@
                     <div class="card-body d-flex flex-column justify-content-between position-relative z-1">
                         <span class="text-light fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Cobertura en Vivo</span>
                         <div class="mt-2 d-flex align-items-center gap-2">
-                            <div class="spinner-grow spinner-grow-sm text-success" role="status"><span class="visually-hidden">Cargando...</span></div>
-                            <span class="fw-bold">Zonas Seguras</span>
+                            <c:choose>
+                                <c:when test="${activeIncidentsCount > 0}">
+                                    <div class="spinner-grow spinner-grow-sm text-danger" role="status"><span class="visually-hidden">Alerta</span></div>
+                                    <span class="fw-bold text-danger">Alerta Activa</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="spinner-grow spinner-grow-sm text-success" role="status"><span class="visually-hidden">Seguro</span></div>
+                                    <span class="fw-bold">Zonas Seguras</span>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
@@ -167,7 +175,7 @@
             <div class="position-relative z-1 p-5 text-white d-flex flex-column justify-content-center h-100">
                 <span class="fw-bold text-uppercase opacity-75" style="font-size: 0.65rem; letter-spacing: 2px;">Mapa de Zonas</span>
                 <h3 class="fw-black mt-1">Complejo Industrial Alpha</h3>
-                <p class="opacity-75 mt-2" style="font-size: 0.85rem; max-width: 400px;">Rastreo espacial en vivo activado. 42 cámaras activas monitoreando 12 zonas perimetrales de alta prioridad.</p>
+                <p class="opacity-75 mt-2" style="font-size: 0.85rem; max-width: 400px;">Rastreo espacial en vivo activado. ${camarasActivasCount} cámaras activas monitoreando ${zonasCount} zonas perimetrales de alta prioridad.</p>
                 <button class="btn btn-outline-light btn-sm mt-3 fw-bold text-uppercase w-auto align-self-start" style="letter-spacing: 1px;">Abrir Visor de Mapa</button>
             </div>
             

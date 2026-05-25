@@ -5,6 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Ingreso al Sistema - Digital Sentinel</title>
+    <link rel="icon" type="image/x-icon" href="/assets/DS-FAVICON.ico"/>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,9 +29,7 @@
 <main class="position-relative z-3 w-100 px-3 py-5" style="max-width: 450px;">
     <!-- Brand Identity -->
     <div class="d-flex flex-column align-items-center mb-4">
-        <div class="signature-gradient d-flex align-items-center justify-content-center rounded-4 shadow mb-3" style="width: 64px; height: 64px;">
-            <span class="material-symbols-outlined text-white fs-3" style="font-variation-settings: 'FILL' 1;">security</span>
-        </div>
+        <img src="/assets/DS-BLACK.webp" alt="Digital Sentinel" style="height: 56px; object-fit: contain; margin-bottom: 1rem;"/>
         <h1 class="font-headline fs-3 fw-bolder text-dark uppercase mb-1">
             Digital Sentinel
         </h1>
