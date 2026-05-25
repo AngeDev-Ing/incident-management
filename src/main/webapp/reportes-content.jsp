@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!-- MAIN CONTENT -->
 <main class="main-content p-4 w-100">
     <div class="container-fluid max-w-7xl">
@@ -67,11 +68,11 @@
                             <path class="line-chart-path" d="M0,250 L100,200 L200,220 L300,100 L400,120 L500,60 L600,180 L700,90 L800,110 L900,40 L1000,70" fill="none" stroke="#0ea5e9" stroke-linecap="round" stroke-width="4"></path>
                         </svg>
                         <div class="d-flex justify-content-between mt-3 text-secondary fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">
-                            <span>01 SEP</span>
-                            <span>08 SEP</span>
-                            <span>15 SEP</span>
-                            <span>22 SEP</span>
-                            <span>29 SEP</span>
+                            <span>01 MAY</span>
+                            <span>08 MAY</span>
+                            <span>15 MAY</span>
+                            <span>22 MAY</span>
+                            <span>29 MAY</span>
                         </div>
                     </div>
                 </div>
@@ -84,12 +85,12 @@
                     <div class="card border-0 shadow rounded-4 bg-dark text-white p-4 flex-grow-1 position-relative overflow-hidden primary-gradient">
                         <div class="position-relative z-3 d-flex flex-column justify-content-between h-100">
                             <div>
-                                <span class="text-info fw-bold text-uppercase d-block mb-1" style="font-size: 0.65rem; letter-spacing: 1px;">Total Mes</span>
-                                <span class="display-3 fw-bold font-headline">1,284</span>
+                                <span class="text-info fw-bold text-uppercase d-block mb-1" style="font-size: 0.65rem; letter-spacing: 1px;">Total Histórico</span>
+                                <span class="display-3 fw-bold font-headline">${totalCount}</span>
                             </div>
                             <div class="mt-4 d-flex align-items-center text-info gap-2" style="font-size: 0.85rem;">
                                 <span class="material-symbols-outlined fs-6">trending_up</span>
-                                <span class="fw-bold">+12.5% vs mes anterior</span>
+                                <span class="fw-bold">Monitoreo Activo</span>
                             </div>
                         </div>
                         <!-- Background icon -->
@@ -132,12 +133,12 @@
                         <div class="col">
                             <div class="d-flex flex-column align-items-center group">
                                 <div class="w-100 bg-light rounded-top-3 position-relative d-flex align-items-end overflow-hidden" style="height: 250px;">
-                                    <div class="w-100 bg-dark primary-gradient opacity-75 group-hover-opacity-100" style="height: 75% !important; transition: height 0.5s ease;"></div>
-                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">75%</span>
+                                    <div class="w-100 bg-dark primary-gradient opacity-75 group-hover-opacity-100 dynamic-bar" data-height="${roboPct}" style="height: 0%; transition: height 0.5s ease;"></div>
+                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">${roboPct}%</span>
                                 </div>
                                 <div class="mt-3 text-center">
-                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Acceso No Aut.</div>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">963 EVENTOS</small>
+                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Robo</div>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${roboCount} EVENTOS</small>
                                 </div>
                             </div>
                         </div>
@@ -145,12 +146,12 @@
                         <div class="col">
                             <div class="d-flex flex-column align-items-center group">
                                 <div class="w-100 bg-light rounded-top-3 position-relative d-flex align-items-end overflow-hidden" style="height: 250px;">
-                                    <div class="w-100 bg-info opacity-75 group-hover-opacity-100" style="height: 42% !important; transition: height 0.5s ease;"></div>
-                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">42%</span>
+                                    <div class="w-100 bg-info opacity-75 group-hover-opacity-100 dynamic-bar" data-height="${sospechosoPct}" style="height: 0%; transition: height 0.5s ease;"></div>
+                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">${sospechosoPct}%</span>
                                 </div>
                                 <div class="mt-3 text-center">
-                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Vandalismo</div>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">540 EVENTOS</small>
+                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Sospechoso</div>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${sospechosoCount} EVENTOS</small>
                                 </div>
                             </div>
                         </div>
@@ -158,12 +159,12 @@
                         <div class="col">
                             <div class="d-flex flex-column align-items-center group">
                                 <div class="w-100 bg-light rounded-top-3 position-relative d-flex align-items-end overflow-hidden" style="height: 250px;">
-                                    <div class="w-100 bg-dark primary-gradient opacity-75 group-hover-opacity-100" style="height: 88% !important; transition: height 0.5s ease;"></div>
-                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">88%</span>
+                                    <div class="w-100 bg-dark primary-gradient opacity-75 group-hover-opacity-100 dynamic-bar" data-height="${accidentePct}" style="height: 0%; transition: height 0.5s ease;"></div>
+                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">${accidentePct}%</span>
                                 </div>
                                 <div class="mt-3 text-center">
-                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Falla Técnica</div>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">1,130 EVENTOS</small>
+                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Accidente</div>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${accidenteCount} EVENTOS</small>
                                 </div>
                             </div>
                         </div>
@@ -171,12 +172,12 @@
                         <div class="col">
                             <div class="d-flex flex-column align-items-center group">
                                 <div class="w-100 bg-light rounded-top-3 position-relative d-flex align-items-end overflow-hidden" style="height: 250px;">
-                                    <div class="w-100 bg-info bg-opacity-50 opacity-75 group-hover-opacity-100" style="height: 15% !important; transition: height 0.5s ease;"></div>
-                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">15%</span>
+                                    <div class="w-100 bg-info bg-opacity-50 opacity-75 group-hover-opacity-100 dynamic-bar" data-height="${infraestructuraPct}" style="height: 0%; transition: height 0.5s ease;"></div>
+                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">${infraestructuraPct}%</span>
                                 </div>
                                 <div class="mt-3 text-center">
-                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Mantenimiento</div>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">192 EVENTOS</small>
+                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Infraestructura</div>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${infraestructuraCount} EVENTOS</small>
                                 </div>
                             </div>
                         </div>
@@ -184,12 +185,12 @@
                         <div class="col">
                             <div class="d-flex flex-column align-items-center group">
                                 <div class="w-100 bg-light rounded-top-3 position-relative d-flex align-items-end overflow-hidden" style="height: 250px;">
-                                    <div class="w-100 bg-secondary opacity-75 group-hover-opacity-100" style="height: 28% !important; transition: height 0.5s ease;"></div>
-                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">28%</span>
+                                    <div class="w-100 bg-secondary opacity-75 group-hover-opacity-100 dynamic-bar" data-height="${mantenimientoPct}" style="height: 0%; transition: height 0.5s ease;"></div>
+                                    <span class="position-absolute top-0 start-50 translate-middle-x mt-2 text-secondary fw-bold" style="font-size: 0.75rem;">${mantenimientoPct}%</span>
                                 </div>
                                 <div class="mt-3 text-center">
-                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Otros</div>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">359 EVENTOS</small>
+                                    <div class="fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Mantenimiento</div>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${mantenimientoCount} EVENTOS</small>
                                 </div>
                             </div>
                         </div>
@@ -227,3 +228,15 @@
 
     </div>
 </main>
+
+<!-- Script para evitar errores de linting CSS en el IDE -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Aplicar las alturas dinámicamente usando JavaScript
+        document.querySelectorAll('.dynamic-bar').forEach(function(bar) {
+            const height = bar.getAttribute('data-height') || 0;
+            // setProperty permite añadir !important dinámicamente
+            bar.style.setProperty('height', height + '%', 'important');
+        });
+    });
+</script>

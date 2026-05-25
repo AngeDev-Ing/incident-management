@@ -1,13 +1,6 @@
-/**
- * Digital Sentinel - SPA Router
- * Handles client-side navigation by fetching JSP content fragments
- * and swapping them into the #spa-content area without full page reloads.
- */
-
 const SPA = {
-    // Maps route names to their server endpoint and page title
     routes: {
-        dashboard:   { endpoint: '/fragment/dashboard',   title: 'Dashboard' },
+        dashboard:   { endpoint: '/fragment/dashboard',   title: 'Panel Principal' },
         incidencias: { endpoint: '/fragment/incidencias', title: 'Incidencias' },
         reportes:    { endpoint: '/fragment/reportes',    title: 'Reportes' },
         camaras:     { endpoint: '/fragment/camaras',     title: 'Cámaras' },
@@ -16,10 +9,25 @@ const SPA = {
     contentArea: null,
     currentPage: null,
 
+    getToken() {
+        return sessionStorage.getItem('jwt_token');
+    },
+
+    logout() {
+        sessionStorage.removeItem('jwt_token');
+        sessionStorage.removeItem('username');
+        window.location.href = '/login';
+    },
+
     init() {
+        const token = this.getToken();
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+
         this.contentArea = document.getElementById('spa-content');
 
-        // Bind sidebar nav links
         document.querySelectorAll('.spa-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -28,14 +36,17 @@ const SPA = {
             });
         });
 
-        // Handle browser back/forward buttons
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.logout());
+        }
+
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page) {
                 this.navigate(e.state.page, false);
             }
         });
 
-        // Load initial page from URL hash or default to dashboard
         const hash = window.location.hash.replace('#', '');
         const initialPage = this.routes[hash] ? hash : 'dashboard';
         this.navigate(initialPage, true);
@@ -55,8 +66,16 @@ const SPA = {
 
         try {
             const response = await fetch(route.endpoint, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': 'Bearer ' + this.getToken()
+                }
             });
+
+            if (response.status === 401 || response.status === 403) {
+                this.logout();
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -66,19 +85,15 @@ const SPA = {
             this.contentArea.innerHTML = html;
             this.currentPage = page;
 
-            // Update browser URL hash (no server request)
             if (pushState) {
                 history.pushState({ page }, route.title, `#${page}`);
             }
 
-            // Update header title
             const titleEl = document.getElementById('pageTitle');
             if (titleEl) titleEl.textContent = route.title;
 
-            // Update document title
             document.title = `${route.title} — Digital Sentinel`;
 
-            // Scroll content area to top
             this.contentArea.scrollTo(0, 0);
             window.scrollTo(0, 0);
 
@@ -117,5 +132,4 @@ const SPA = {
     }
 };
 
-// Boot the SPA when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => SPA.init());

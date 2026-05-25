@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Digital Sentinel - Operational Command</title>
+    <title>Digital Sentinel - Centro de Control</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -26,8 +26,8 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
             </div>
             <div>
-                <h6 class="fw-bold mb-0">Operational Command</h6>
-                <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">Level 4 Authorization</small>
+                <h6 class="fw-bold mb-0">Centro de Control</h6>
+                <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">Autorización Nivel 4</small>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
     <ul class="nav nav-pills flex-column mb-auto px-3 gap-1">
         <li class="nav-item">
             <a href="#" class="nav-link text-white spa-link d-flex align-items-center gap-3" data-page="dashboard">
-                <span class="material-symbols-outlined">dashboard</span> Dashboard
+                <span class="material-symbols-outlined">dashboard</span> Panel Principal
             </a>
         </li>
         <li>
@@ -59,7 +59,7 @@
         <a href="#" class="text-white text-decoration-none opacity-75 d-flex align-items-center gap-2 mb-2" style="font-size: 0.9rem;">
             <span class="material-symbols-outlined fs-6">support_agent</span> Soporte
         </a>
-        <a href="/logout" class="text-white text-decoration-none opacity-75 d-flex align-items-center gap-2 mb-4" style="font-size: 0.9rem;">
+        <a href="#" onclick="SPA.logout()" class="text-white text-decoration-none opacity-75 d-flex align-items-center gap-2 mb-4" style="font-size: 0.9rem;">
             <span class="material-symbols-outlined fs-6">logout</span> Cerrar Sesión
         </a>
 

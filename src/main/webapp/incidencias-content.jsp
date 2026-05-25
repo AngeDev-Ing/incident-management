@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!-- MAIN CONTENT -->
 <main class="main-content p-4 w-100">
     <div class="container-fluid max-w-7xl">
@@ -24,9 +26,9 @@
                     <div class="card-body p-4">
                         <span class="text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">Pendientes</span>
                         <div class="d-flex justify-content-between align-items-end">
-                            <span class="fs-2 fw-bold text-dark">24</span>
+                            <span class="fs-2 fw-bold text-dark">${pendientesCount}</span>
                             <span class="text-danger fw-bold d-flex align-items-center" style="font-size: 0.8rem;">
-                                <span class="material-symbols-outlined fs-6 me-1">trending_up</span> 12%
+                                <span class="material-symbols-outlined fs-6 me-1">trending_up</span> Activas
                             </span>
                         </div>
                     </div>
@@ -37,9 +39,9 @@
                     <div class="card-body p-4">
                         <span class="text-secondary fw-bold text-uppercase d-block mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">En Proceso</span>
                         <div class="d-flex justify-content-between align-items-end">
-                            <span class="fs-2 fw-bold text-dark">08</span>
+                            <span class="fs-2 fw-bold text-dark">${enProcesoCount}</span>
                             <span class="text-secondary fw-bold d-flex align-items-center" style="font-size: 0.8rem;">
-                                <span class="material-symbols-outlined fs-6 me-1">remove</span> 0%
+                                <span class="material-symbols-outlined fs-6 me-1">remove</span> En Curso
                             </span>
                         </div>
                     </div>
@@ -83,141 +85,53 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Row 1 -->
-                        <tr class="group">
-                            <td class="ps-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-danger rounded-circle p-1" style="width: 8px; height: 8px;">&nbsp;</span>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">Intrusión Perímetro Norte</div>
-                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem;">ID: INC-8842-X</div>
+                        <c:forEach var="inc" items="${incidencias}">
+                            <tr class="group">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge <c:choose><c:when test="${inc.status == 'Pendiente'}">bg-danger</c:when><c:when test="${inc.status == 'En Proceso'}">bg-info</c:when><c:otherwise>bg-secondary</c:otherwise></c:choose> rounded-circle p-1" style="width: 8px; height: 8px;">&nbsp;</span>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">${inc.title}</div>
+                                            <div class="text-muted text-uppercase" style="font-size: 0.65rem;">ID: INC-${inc.id}-X</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="text-end py-3">
-                                <div class="fw-medium text-dark" style="font-size: 0.85rem;">Hoy, 14:20</div>
-                                <div class="text-muted text-uppercase" style="font-size: 0.65rem;">Hace 15 min</div>
-                            </td>
-                            <td class="py-3">
-                                <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 0.85rem;">
-                                    <span class="material-symbols-outlined fs-5 text-primary">security</span>
-                                    <span>Seguridad Física</span>
-                                </div>
-                            </td>
-                            <td class="text-center py-3">
-                                <span class="badge bg-danger text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">Pendiente</span>
-                            </td>
-                            <td class="text-end pe-4 py-3">
-                                <div class="d-flex gap-1 justify-content-end group-hover-visible">
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">visibility</span></button>
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">edit</span></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 2 -->
-                        <tr class="group">
-                            <td class="ps-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-info rounded-circle p-1" style="width: 8px; height: 8px;">&nbsp;</span>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">Falla Sensor Cámara 04</div>
-                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem;">ID: INC-7721-M</div>
+                                </td>
+                                <td class="text-end py-3">
+                                    <div class="fw-medium text-dark" style="font-size: 0.85rem;">${inc.date}</div>
+                                    <div class="text-muted text-uppercase" style="font-size: 0.65rem;">${inc.time}</div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 0.85rem;">
+                                        <span class="material-symbols-outlined fs-5 text-primary">
+                                            <c:choose>
+                                                <c:when test="${inc.type == 'Robo'}">security</c:when>
+                                                <c:when test="${inc.type == 'Accidente'}">videocam_off</c:when>
+                                                <c:otherwise>thermostat</c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                        <span>${inc.type}</span>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="text-end py-3">
-                                <div class="fw-medium text-dark" style="font-size: 0.85rem;">Hoy, 12:45</div>
-                                <div class="text-muted text-uppercase" style="font-size: 0.65rem;">Hace 2 horas</div>
-                            </td>
-                            <td class="py-3">
-                                <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 0.85rem;">
-                                    <span class="material-symbols-outlined fs-5 text-primary">videocam_off</span>
-                                    <span>Mantenimiento</span>
-                                </div>
-                            </td>
-                            <td class="text-center py-3">
-                                <span class="badge bg-info text-dark text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">En Proceso</span>
-                            </td>
-                            <td class="text-end pe-4 py-3">
-                                <div class="d-flex gap-1 justify-content-end group-hover-visible">
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">visibility</span></button>
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">edit</span></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 3 -->
-                        <tr class="group">
-                            <td class="ps-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-secondary rounded-circle p-1" style="width: 8px; height: 8px;">&nbsp;</span>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">Acceso No Autorizado Nivel 2</div>
-                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem;">ID: INC-6512-Z</div>
+                                </td>
+                                <td class="text-center py-3">
+                                    <span class="badge <c:choose><c:when test="${inc.status == 'Pendiente'}">bg-danger</c:when><c:when test="${inc.status == 'En Proceso'}">bg-info text-dark</c:when><c:otherwise>bg-secondary</c:otherwise></c:choose> text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">${inc.status}</span>
+                                </td>
+                                <td class="text-end pe-4 py-3">
+                                    <div class="d-flex gap-1 justify-content-end group-hover-visible">
+                                        <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">visibility</span></button>
+                                        <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">edit</span></button>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="text-end py-3">
-                                <div class="fw-medium text-dark" style="font-size: 0.85rem;">Ayer, 23:10</div>
-                                <div class="text-muted text-uppercase" style="font-size: 0.65rem;">Finalizado</div>
-                            </td>
-                            <td class="py-3">
-                                <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 0.85rem;">
-                                    <span class="material-symbols-outlined fs-5 text-primary">vpn_key</span>
-                                    <span>Credenciales</span>
-                                </div>
-                            </td>
-                            <td class="text-center py-3">
-                                <span class="badge bg-secondary text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">Resuelto</span>
-                            </td>
-                            <td class="text-end pe-4 py-3">
-                                <div class="d-flex gap-1 justify-content-end group-hover-visible">
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">visibility</span></button>
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">edit</span></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 4 -->
-                        <tr class="group">
-                            <td class="ps-4 py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="badge bg-danger rounded-circle p-1" style="width: 8px; height: 8px;">&nbsp;</span>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">Anomalía Térmica Sector B</div>
-                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem;">ID: INC-9901-H</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-end py-3">
-                                <div class="fw-medium text-dark" style="font-size: 0.85rem;">Ayer, 18:30</div>
-                                <div class="text-muted text-uppercase" style="font-size: 0.65rem;">Urgente</div>
-                            </td>
-                            <td class="py-3">
-                                <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 0.85rem;">
-                                    <span class="material-symbols-outlined fs-5 text-primary">thermostat</span>
-                                    <span>Infraestructura</span>
-                                </div>
-                            </td>
-                            <td class="text-center py-3">
-                                <span class="badge bg-danger text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">Pendiente</span>
-                            </td>
-                            <td class="text-end pe-4 py-3">
-                                <div class="d-flex gap-1 justify-content-end group-hover-visible">
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">visibility</span></button>
-                                    <button class="btn btn-sm btn-light text-secondary"><span class="material-symbols-outlined fs-6">edit</span></button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        </c:forEach>
                     </tbody>
                 </table>
             </div>
             
             <div class="card-footer bg-white border-top-0 p-3 d-flex justify-content-between align-items-center">
-                <span class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Mostrando 1-10 de 124 incidencias</span>
+                <span class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Total de ${fn:length(incidencias)} incidencias en base de datos</span>
                 <ul class="pagination pagination-sm mb-0">
                     <li class="page-item"><a class="page-link text-muted border-light" href="#">&laquo;</a></li>
                     <li class="page-item active"><a class="page-link bg-dark border-dark" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link text-dark border-light" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link text-dark border-light" href="#">3</a></li>
                     <li class="page-item"><a class="page-link text-muted border-light" href="#">&raquo;</a></li>
                 </ul>
             </div>
@@ -225,3 +139,4 @@
 
     </div>
 </main>
+

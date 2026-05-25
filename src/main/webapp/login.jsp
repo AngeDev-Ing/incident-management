@@ -35,7 +35,7 @@
             Digital Sentinel
         </h1>
         <p class="text-secondary text-uppercase tracking-wider fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.2em;">
-            Operational Command Unit
+            Unidad de Comando Operativo
         </p>
     </div>
     
@@ -43,14 +43,9 @@
     <div class="card border-0 shadow rounded-4 p-4 glass-panel">
         <h5 class="fw-bold text-dark text-center mb-4 font-headline">Ingreso al Sistema</h5>
         
-        <% if (request.getAttribute("error") != null) { %>
-            <div class="alert alert-danger py-2 rounded-3 text-center mb-3" style="font-size: 0.8rem; border: none; background-color: rgba(220, 53, 69, 0.1); color: #dc3545;">
-                <span class="material-symbols-outlined fs-6 align-middle me-1">error</span>
-                <%= request.getAttribute("error") %>
-            </div>
-        <% } %>
+        <div id="alertContainer"></div>
         
-        <form action="/login" method="POST">
+        <form id="loginForm">
             <!-- Username Field -->
             <div class="mb-3">
                 <label class="form-label text-secondary fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.65rem; letter-spacing: 0.05em;" for="username">
@@ -66,14 +61,14 @@
                 </label>
                 <div class="position-relative">
                     <input class="form-control form-control-sm bg-light border-0 py-2.5 rounded-3 pe-5 text-dark" id="password" name="password" placeholder="••••••••" type="password" required />
-                    <button class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-secondary p-2 d-flex align-items-center text-decoration-none" type="button">
-                        <span class="material-symbols-outlined fs-5">visibility</span>
+                    <button class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-secondary p-2 d-flex align-items-center text-decoration-none" type="button" onclick="togglePassword()">
+                        <span class="material-symbols-outlined fs-5" id="eyeIcon">visibility</span>
                     </button>
                 </div>
             </div>
             
             <!-- Action Bar -->
-            <button class="btn btn-dark w-100 signature-gradient border-0 py-3 rounded-3 fw-bold text-uppercase tracking-wider d-flex align-items-center justify-content-center gap-2" type="submit">
+            <button class="btn btn-dark w-100 signature-gradient border-0 py-3 rounded-3 fw-bold text-uppercase tracking-wider d-flex align-items-center justify-content-center gap-2" type="submit" id="submitBtn">
                 Iniciar Sesión
                 <span class="material-symbols-outlined fs-5">login</span>
             </button>
@@ -102,12 +97,69 @@
 <div class="position-absolute bottom-0 end-0 p-5 d-none d-lg-block opacity-25">
     <div class="d-flex flex-column align-items-end">
         <div class="bg-dark" style="width: 128px; height: 1px;"></div>
-        <div class="font-headline text-dark fw-black display-2 leading-none">01</div>
-        <div class="text-secondary text-uppercase tracking-wider" style="font-size: 0.6rem; letter-spacing: 0.5em;">Command_Center</div>
+        <div class="text-secondary text-uppercase tracking-wider" style="font-size: 0.6rem; letter-spacing: 0.5em;">Centro_de_Comando</div>
     </div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        const icon = type === 'danger' ? 'error' : 'check_circle';
+        const color = type === 'danger' ? '#dc3545' : '#198754';
+        const bg = type === 'danger' ? 'rgba(220,53,69,0.1)' : 'rgba(25,135,84,0.1)';
+        container.innerHTML = `
+            <div class="alert py-2 rounded-3 text-center mb-3" style="font-size:0.8rem;border:none;background-color:${bg};color:${color};">
+                <span class="material-symbols-outlined fs-6 align-middle me-1">${icon}</span> ${message}
+            </div>`;
+    }
+
+    function togglePassword() {
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('eyeIcon');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.textContent = 'visibility_off';
+        } else {
+            pwd.type = 'password';
+            icon.textContent = 'visibility';
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Autenticando...';
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                sessionStorage.setItem('jwt_token', data.token);
+                sessionStorage.setItem('username', data.username);
+                window.location.href = '/app';
+            } else {
+                showAlert(data.error || 'Credenciales incorrectas.', 'danger');
+                btn.disabled = false;
+                btn.innerHTML = 'Iniciar Sesión <span class="material-symbols-outlined fs-5">login</span>';
+            }
+        } catch (err) {
+            showAlert('Error de conexión con el servidor.', 'danger');
+            btn.disabled = false;
+            btn.innerHTML = 'Iniciar Sesión <span class="material-symbols-outlined fs-5">login</span>';
+        }
+    });
+</script>
 </body>
 </html>
