@@ -5,6 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Digital Sentinel - Centro de Control</title>
+    <link rel="icon" type="image/x-icon" href="/assets/DS-FAVICON.ico"/>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,13 +21,11 @@
 
 <!-- SIDEBAR -->
 <aside class="sidebar bg-dark text-white d-flex flex-column shadow">
-    <div class="p-4">
+    <div class="p-4 border-bottom border-secondary">
         <div class="d-flex align-items-center gap-3">
-            <div class="primary-gradient d-flex align-items-center justify-content-center rounded-3 text-white" style="width: 40px; height: 40px;">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
-            </div>
+            <img src="/assets/DS-WHITE.webp" alt="Digital Sentinel" style="height: 36px; object-fit: contain;"/>
             <div>
-                <h6 class="fw-bold mb-0">Centro de Control</h6>
+                <h6 class="fw-bold mb-0 text-white">Centro de Control</h6>
                 <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">Autorización Nivel 4</small>
             </div>
         </div>
@@ -89,7 +88,7 @@
     <div class="d-flex align-items-center gap-3">
         <button class="btn btn-link text-secondary p-0 position-relative">
             <span class="material-symbols-outlined">notifications</span>
-            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle" style="width: 6px; height: 6px;"></span>
+            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none" style="width: 8px; height: 8px;"></span>
         </button>
         <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">settings</span></button>
         <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">account_circle</span></button>
@@ -109,6 +108,9 @@
 
 <!-- Bootstrap 5 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- WebSockets: SockJS & STOMP -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <!-- SPA Router -->
 <script src="/js/app.js"></script>
 </body>
