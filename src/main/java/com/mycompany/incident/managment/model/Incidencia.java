@@ -1,5 +1,7 @@
 package com.mycompany.incident.managment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "incidencias")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Incidencia {
 
     @Id
@@ -45,25 +48,30 @@ public class Incidencia {
     /** Supervisor responsable (FK → usuarios) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supervisor_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuario supervisorUsuario;
 
     /** Operador que atiende la incidencia (FK → usuarios) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operador_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuario operadorUsuario;
 
     /** Cámara que detectó la incidencia (FK → camaras) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camara_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Camara camara;
 
     /** Evidencias multimedia adjuntas */
     @OneToMany(mappedBy = "incidencia", fetch = FetchType.LAZY,
                cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Evidencia> evidencias;
 
     /** Notificaciones generadas por esta incidencia */
     @OneToMany(mappedBy = "incidencia", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Notificacion> notificaciones;
 
     /** Cuándo se creó el registro en el sistema */
