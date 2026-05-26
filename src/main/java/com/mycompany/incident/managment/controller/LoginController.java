@@ -113,7 +113,7 @@ public class LoginController {
         }
         
         model.addAttribute("activeIncidentsCount", activeIncidents);
-        model.addAttribute("incidencias", incidenciaRepo.findTop3ByOrderByIdDesc());
+        model.addAttribute("incidencias", incidenciaRepo.findAllByOrderByIdDesc());
         model.addAttribute("totalIncidentsCount", incidenciaRepo.count());
         model.addAttribute("camarasActivasCount", totalCamarasActivas);
         model.addAttribute("zonasCount", totalZonas);
@@ -121,6 +121,7 @@ public class LoginController {
         model.addAttribute("tiempoPromedio", tiempoPromedio);
         model.addAttribute("tendenciaRespuesta", tendencia);
         model.addAttribute("tendenciaColor", tendenciaColor);
+        model.addAttribute("camaras", todasLasCamaras);
         
         return "dashboard-content";
     }
@@ -132,6 +133,23 @@ public class LoginController {
         model.addAttribute("pendientesCount", pendientes);
         model.addAttribute("enProcesoCount", enProceso);
         model.addAttribute("incidencias", incidenciaRepo.findAllByOrderByIdDesc());
+        model.addAttribute("camaras", camaraRepo.findAll());
+        List<com.mycompany.incident.managment.model.Incidencia> resueltas = incidenciaRepo.findAll().stream()
+                .filter(i -> i.getCreadoEn() != null && i.getResueltoEn() != null)
+                .toList();
+                
+        long totalMinutos = 0;
+        for (com.mycompany.incident.managment.model.Incidencia i : resueltas) {
+            totalMinutos += java.time.Duration.between(i.getCreadoEn(), i.getResueltoEn()).toMinutes();
+        }
+        
+        String tiempoPromedio = "0m";
+        if (!resueltas.isEmpty()) {
+            long promedio = totalMinutos / resueltas.size();
+            tiempoPromedio = promedio + " min";
+        }
+
+        model.addAttribute("tiempoPromedio", tiempoPromedio);
         return "incidencias-content";
     }
 

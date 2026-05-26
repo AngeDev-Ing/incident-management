@@ -69,19 +69,19 @@
                         <span class="material-symbols-outlined text-muted">edit_note</span>
                     </div>
                     <div class="card-body p-4">
-                        <form>
+                        <div id="quickIncidenciaForm">
                             <div class="mb-3">
                                 <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Título</label>
-                                <input type="text" class="form-control form-control-sm bg-light border-0 py-2" placeholder="Ingrese el título...">
+                                <input type="text" id="qTitle" class="form-control form-control-sm bg-light border-0 py-2" placeholder="Ingrese el título..." required>
                             </div>
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
                                     <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Fecha</label>
-                                    <input type="date" class="form-control form-control-sm bg-light border-0 py-2">
+                                    <input type="date" id="qDate" class="form-control form-control-sm bg-light border-0 py-2" required>
                                 </div>
                                 <div class="col-6">
                                     <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Tipo</label>
-                                    <select class="form-select form-select-sm bg-light border-0 py-2">
+                                    <select id="qType" class="form-select form-select-sm bg-light border-0 py-2">
                                         <option>Robo</option>
                                         <option>Sospechoso</option>
                                         <option>Accidente</option>
@@ -91,26 +91,28 @@
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
                                     <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Supervisor</label>
-                                    <input type="text" class="form-control form-control-sm bg-light border-0 py-2">
+                                    <input type="text" id="qSupervisor" class="form-control form-control-sm bg-light border-0 py-2">
                                 </div>
                                 <div class="col-6">
                                     <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Operador</label>
-                                    <input type="text" class="form-control form-control-sm bg-light border-0 py-2">
+                                    <input type="text" id="qOperator" class="form-control form-control-sm bg-light border-0 py-2">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Cámara</label>
-                                <select class="form-select form-select-sm bg-light border-0 py-2">
-                                    <option>Cam 1 - Entrada Principal</option>
-                                    <option>Cam 2 - Perímetro Norte</option>
+                                <select id="qCamera" class="form-select form-select-sm bg-light border-0 py-2">
+                                    <option value="" disabled selected>Seleccione una cámara...</option>
+                                    <c:forEach var="cam" items="${camaras}">
+                                        <option value="Cam ${cam.id} - ${cam.name}">Cam ${cam.id} - ${cam.name}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Descripción</label>
-                                <textarea class="form-control form-control-sm bg-light border-0 py-2" rows="3" placeholder="Detalles de la incidencia..."></textarea>
+                                <textarea id="qDesc" class="form-control form-control-sm bg-light border-0 py-2" rows="3" placeholder="Detalles de la incidencia..."></textarea>
                             </div>
-                            <button class="btn btn-dark w-100 fw-bold rounded-3 py-2">Guardar Registro</button>
-                        </form>
+                            <button type="button" id="btnQuickSave" class="btn btn-dark w-100 fw-bold rounded-3 py-2">Guardar Registro</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,9 +127,9 @@
                             <button class="btn btn-sm btn-light text-muted"><span class="material-symbols-outlined fs-6">download</span></button>
                         </div>
                     </div>
-                    <div class="table-responsive">
+                    <div class="table-responsive flex-fill" style="overflow-y: auto; min-height: 300px;">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-muted">
+                            <thead class="table-light text-muted position-sticky top-0 z-1">
                                 <tr>
                                     <th class="text-uppercase fw-bold border-bottom-0 py-3 ps-4" style="font-size: 0.65rem;">Fecha</th>
                                     <th class="text-uppercase fw-bold border-bottom-0 py-3" style="font-size: 0.65rem;">Incidente</th>
@@ -147,21 +149,15 @@
                                         <td class="py-3">
                                             <span class="badge <c:choose><c:when test="${inc.type == 'Robo'}">bg-danger</c:when><c:when test="${inc.type == 'Sospechoso'}">bg-warning text-dark</c:when><c:otherwise>bg-info text-dark</c:otherwise></c:choose> text-uppercase px-3 py-2 rounded-pill">${inc.type}</span>
                                         </td>
-                                        <td class="py-3"><span style="font-size: 0.85rem;" class="text-secondary">${inc.supervisor}</span></td>
-                                        <td class="text-end pe-4 py-3"><button class="btn btn-link text-muted p-0"><span class="material-symbols-outlined">visibility</span></button></td>
+                                        <td class="py-3"><span style="font-size: 0.85rem;" class="text-secondary">${empty inc.supervisor ? 'N/A' : inc.supervisor}</span></td>
+                                        <td class="text-end pe-4 py-3"></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>
                         </table>
                     </div>
                     <div class="card-footer bg-white border-top-0 p-3 mt-auto d-flex justify-content-between align-items-center rounded-bottom-4">
-                        <span class="text-muted" style="font-size: 0.75rem;">Últimos 3 registros</span>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item"><a class="page-link text-muted border-light" href="#">&laquo;</a></li>
-                            <li class="page-item active"><a class="page-link bg-dark border-dark" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link text-dark border-light" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link text-muted border-light" href="#">&raquo;</a></li>
-                        </ul>
+                        <span class="text-muted" style="font-size: 0.75rem;">Mostrando todas las incidencias</span>
                     </div>
                 </div>
             </div>
@@ -189,3 +185,75 @@
 
     </div>
 </main>
+
+<script>
+(function() {
+    function getToken() { return localStorage.getItem('jwt_token') || ''; }
+
+    // Rellenar fecha con el día actual si está vacía
+    var dateInput = document.getElementById('qDate');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    var btnSave = document.getElementById('btnQuickSave');
+    if (btnSave) {
+        btnSave.addEventListener('click', function(e) {
+            e.preventDefault();
+            var title = document.getElementById('qTitle').value.trim();
+            var date = document.getElementById('qDate').value;
+            var type = document.getElementById('qType').value;
+            var supervisor = document.getElementById('qSupervisor').value.trim();
+            var operator = document.getElementById('qOperator').value.trim();
+            var camera = document.getElementById('qCamera').value;
+            var desc = document.getElementById('qDesc').value.trim();
+
+            if (!title || !date) {
+                alert("El título y la fecha son obligatorios.");
+                return;
+            }
+
+            // Usamos la hora local actual como default
+            var time = new Date().toTimeString().substring(0, 5);
+
+            var payload = {
+                title: title,
+                date: date,
+                time: time,
+                type: type,
+                supervisor: supervisor,
+                operator: operator,
+                camera: camera,
+                description: desc,
+                status: 'Pendiente',
+                priority: 'Media'
+            };
+
+            btnSave.disabled = true;
+            btnSave.innerText = 'Guardando...';
+
+            fetch('/api/incidencias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Error ' + res.status);
+                // Si guardó ok, limpiamos campos y refrescamos dashboard
+                document.getElementById('qTitle').value = '';
+                document.getElementById('qDesc').value = '';
+                if (window.SPA) SPA.reload(); // Recarga el dashboard y la tablita historial
+            })
+            .catch(function(err) {
+                console.error("[Dashboard] Error guardando incidencia", err);
+                alert("No se pudo guardar: " + err.message);
+                btnSave.disabled = false;
+                btnSave.innerText = 'Guardar Registro';
+            });
+        });
+    }
+})();
+</script>
