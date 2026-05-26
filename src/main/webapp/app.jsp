@@ -22,11 +22,11 @@
 <!-- SIDEBAR -->
 <aside class="sidebar bg-dark text-white d-flex flex-column shadow">
     <div class="p-4 border-bottom border-secondary">
-        <div class="d-flex align-items-center gap-3">
-            <img src="/assets/DS-WHITE.webp" alt="Digital Sentinel" style="height: 36px; object-fit: contain;"/>
+        <div class="d-flex flex-column gap-3">
+            <img src="/assets/DS-WHITE.webp" alt="Digital Sentinel" style="width: 100%; max-height: 40px; object-fit: contain; object-position: left;"/>
             <div>
-                <h6 class="fw-bold mb-0 text-white">Centro de Control</h6>
-                <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.65rem;">Autorización Nivel 4</small>
+                <h6 class="fw-bold mb-1 text-white">Centro de Control</h6>
+                <small class="text-secondary text-uppercase fw-bold d-block" style="letter-spacing: 1px; font-size: 0.65rem;">Autorización Nivel 4</small>
             </div>
         </div>
     </div>
@@ -142,6 +142,33 @@
 <script src="/js/app.js"></script>
 <script>
 document.addEventListener("click", function (e) {
+    const btnVer = e.target.closest(".btn-ver-incidencia");
+    if (btnVer) {
+        document.getElementById("detTitle").innerText = btnVer.dataset.title || "Sin Título";
+        document.getElementById("detId").innerText = "ID: INC-" + btnVer.dataset.id + "-X";
+        
+        let prio = btnVer.dataset.priority || "Media";
+        let detPriority = document.getElementById("detPriority");
+        detPriority.innerText = prio;
+        detPriority.className = "badge px-3 py-2 rounded-pill text-uppercase fs-7 " + 
+            (prio === 'Crítica' ? 'bg-danger' : (prio === 'Alta' ? 'bg-warning text-dark' : (prio === 'Media' ? 'bg-primary' : 'bg-secondary')));
+            
+        let stat = btnVer.dataset.status || "Pendiente";
+        let detStatus = document.getElementById("detStatus");
+        detStatus.innerText = stat;
+        detStatus.className = "badge px-3 py-2 rounded-pill text-uppercase fs-7 " +
+            (stat === 'Pendiente' ? 'bg-danger' : (stat === 'En Proceso' ? 'bg-info text-dark' : (stat === 'Resuelto' ? 'bg-success' : 'bg-secondary')));
+
+        document.getElementById("detType").innerText = btnVer.dataset.type || "Desconocido";
+        document.getElementById("detDate").innerText = btnVer.dataset.date || "--/--/----";
+        document.getElementById("detTime").innerText = btnVer.dataset.time || "--:--";
+        document.getElementById("detCamera").innerText = btnVer.dataset.camera || "Sin Cámara asignada";
+        document.getElementById("detSupervisor").innerText = btnVer.dataset.supervisor || "No asignado";
+        document.getElementById("detOperator").innerText = btnVer.dataset.operator || "No asignado";
+        document.getElementById("detDescription").innerText = btnVer.dataset.description || "No se adjuntó descripción del evento.";
+        return;
+    }
+
     const btnEditar = e.target.closest(".btn-editar-incidencia");
 
     if (!btnEditar) return;
@@ -158,6 +185,9 @@ document.addEventListener("click", function (e) {
         document.getElementById("type").value = btnEditar.dataset.type || "Robo";
         document.getElementById("priority").value = btnEditar.dataset.priority || "Media";
         document.getElementById("status").value = btnEditar.dataset.status || "Pendiente";
+        document.getElementById("supervisor").value = btnEditar.dataset.supervisor || "";
+        document.getElementById("operator").value = btnEditar.dataset.operator || "";
+        document.getElementById("camera").value = btnEditar.dataset.camera || "";
     }, 500);
 });
 
@@ -177,6 +207,9 @@ document.addEventListener("click", function (e) {
     document.getElementById("type").value = "Robo";
     document.getElementById("priority").value = "Media";
     document.getElementById("status").value = "Pendiente";
+    document.getElementById("supervisor").value = "";
+    document.getElementById("operator").value = "";
+    document.getElementById("camera").value = "";
 });
 
 document.addEventListener("click", async function (e) {
@@ -193,7 +226,10 @@ document.addEventListener("click", async function (e) {
         time: document.getElementById("time").value,
         type: document.getElementById("type").value,
         priority: document.getElementById("priority").value,
-        status: document.getElementById("status").value
+        status: document.getElementById("status").value,
+        supervisor: document.getElementById("supervisor").value,
+        operator: document.getElementById("operator").value,
+        camera: document.getElementById("camera").value
     };
 
     if (!incidencia.title || !incidencia.date || !incidencia.time) {

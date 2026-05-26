@@ -64,7 +64,7 @@
                             <span class="text-light fw-bold text-uppercase d-block mb-1" style="font-size: 0.65rem; letter-spacing: 1px;">
                                 Tiempo Medio de Respuesta
                             </span>
-                            <span class="fs-2 fw-bold">4.2 min</span>
+                            <span class="fs-2 fw-bold">${tiempoPromedio}</span>
                         </div>
                         <p class="text-light opacity-25 font-monospace mb-0 mt-3" style="font-size: 0.6rem;">
                             SENTINEL_KPI_SYSTEM_STABLE
@@ -95,6 +95,9 @@
                             <th class="text-uppercase fw-bold border-bottom-0 py-3 ps-4" style="font-size: 0.65rem;">Nombre de Incidencia</th>
                             <th class="text-uppercase fw-bold border-bottom-0 py-3 text-end" style="font-size: 0.65rem;">Fecha / Hora</th>
                             <th class="text-uppercase fw-bold border-bottom-0 py-3" style="font-size: 0.65rem;">Tipo</th>
+                            <th class="text-uppercase fw-bold border-bottom-0 py-3" style="font-size: 0.65rem;">Cámara</th>
+                            <th class="text-uppercase fw-bold border-bottom-0 py-3" style="font-size: 0.65rem;">Personal</th>
+                            <th class="text-uppercase fw-bold border-bottom-0 py-3 text-center" style="font-size: 0.65rem;">Prioridad</th>
                             <th class="text-uppercase fw-bold border-bottom-0 py-3 text-center" style="font-size: 0.65rem;">Estado</th>
                             <th class="border-bottom-0 py-3 pe-4"></th>
                         </tr>
@@ -139,6 +142,30 @@
                                     </div>
                                 </td>
 
+                                <td class="py-3">
+                                    <div class="fw-medium text-dark" style="font-size: 0.85rem;">
+                                        ${empty inc.camera ? 'Sin cámara' : inc.camera}
+                                    </div>
+                                </td>
+
+                                <td class="py-3">
+                                    <div class="fw-medium text-dark" style="font-size: 0.85rem;">S: ${empty inc.supervisor ? 'N/A' : inc.supervisor}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">O: ${empty inc.operator ? 'N/A' : inc.operator}</div>
+                                </td>
+
+                                <td class="text-center py-3">
+                                    <span class="badge 
+                                        <c:choose>
+                                            <c:when test="${inc.priority == 'Crítica'}">bg-danger</c:when>
+                                            <c:when test="${inc.priority == 'Alta'}">bg-warning text-dark</c:when>
+                                            <c:when test="${inc.priority == 'Media'}">bg-primary</c:when>
+                                            <c:otherwise>bg-secondary</c:otherwise>
+                                        </c:choose>
+                                        text-uppercase px-3 py-2 rounded-pill" style="font-size: 0.65rem;">
+                                        ${inc.priority}
+                                    </span>
+                                </td>
+
                                 <td class="text-center py-3">
                                     <span class="badge 
                                         <c:choose>
@@ -154,7 +181,22 @@
 
                                 <td class="text-end pe-4 py-3">
                                     <div class="d-flex gap-1 justify-content-end group-hover-visible">
-                                        <button class="btn btn-sm btn-light text-secondary">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-light text-secondary btn-ver-incidencia"
+                                            data-id="${inc.id}"
+                                            data-title="${inc.title}"
+                                            data-description="${inc.description}"
+                                            data-date="${inc.date}"
+                                            data-time="${inc.time}"
+                                            data-type="${inc.type}"
+                                            data-priority="${inc.priority}"
+                                            data-status="${inc.status}"
+                                            data-supervisor="${inc.supervisor}"
+                                            data-operator="${inc.operator}"
+                                            data-camera="${inc.camera}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDetalleIncidencia">
                                             <span class="material-symbols-outlined fs-6">visibility</span>
                                         </button>
 
@@ -169,6 +211,9 @@
                                             data-type="${inc.type}"
                                             data-priority="${inc.priority}"
                                             data-status="${inc.status}"
+                                            data-supervisor="${inc.supervisor}"
+                                            data-operator="${inc.operator}"
+                                            data-camera="${inc.camera}"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalIncidencia">
                                             <span class="material-symbols-outlined fs-6">edit</span>
@@ -253,6 +298,26 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Supervisor</label>
+                            <input type="text" id="supervisor" class="form-control rounded-3">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Operador</label>
+                            <input type="text" id="operator" class="form-control rounded-3">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Cámara Asociada</label>
+                            <select id="camera" class="form-select rounded-3">
+                                <option value="" disabled selected>Seleccione una cámara...</option>
+                                <c:forEach var="cam" items="${camaras}">
+                                    <option value="Cam ${cam.id} - ${cam.name}">Cam ${cam.id} - ${cam.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Prioridad</label>
                             <select id="priority" class="form-select rounded-3">
                                 <option>Baja</option>
@@ -287,6 +352,91 @@
                     </button>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DETALLE INCIDENCIA (READ ONLY) -->
+    <div class="modal fade" id="modalDetalleIncidencia" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+
+                <div class="modal-header border-bottom pb-3">
+                    <div>
+                        <h4 class="modal-title fw-bold text-dark mb-0" id="detTitle">Título de la Incidencia</h4>
+                        <div class="text-muted text-uppercase mt-1" style="font-size: 0.75rem; letter-spacing: 1px;" id="detId">ID: INC-XX</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Header Badges -->
+                    <div class="d-flex gap-2 mb-4 pb-3 border-bottom border-secondary-subtle">
+                        <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase fs-7" id="detPriority">PRIORIDAD</span>
+                        <span class="badge bg-dark px-3 py-2 rounded-pill text-uppercase fs-7" id="detStatus">ESTADO</span>
+                        <span class="badge border border-secondary text-secondary px-3 py-2 rounded-pill text-uppercase fs-7 bg-white" id="detType">TIPO</span>
+                    </div>
+
+                    <!-- Details Section -->
+                    <h6 class="fw-bold text-dark text-uppercase mb-3 d-flex align-items-center gap-2" style="letter-spacing: 0.5px;">
+                        <span class="material-symbols-outlined fs-5">info</span> Información General
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-body py-2 px-3">
+                                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Fecha y Hora</div>
+                                    <div class="fw-bold text-dark fs-6"><span id="detDate"></span> &bull; <span id="detTime"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-body py-2 px-3">
+                                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Cámara Asignada</div>
+                                    <div class="fw-bold text-dark fs-6 text-truncate" id="detCamera">Sin Cámara</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark text-uppercase mb-3 d-flex align-items-center gap-2" style="letter-spacing: 0.5px;">
+                        <span class="material-symbols-outlined fs-5">group</span> Personal a Cargo
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-body py-2 px-3">
+                                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Supervisor</div>
+                                    <div class="fw-bold text-dark fs-6 text-truncate" id="detSupervisor">No asignado</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-body py-2 px-3">
+                                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Operador</div>
+                                    <div class="fw-bold text-dark fs-6 text-truncate" id="detOperator">No asignado</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark text-uppercase mb-3 d-flex align-items-center gap-2" style="letter-spacing: 0.5px;">
+                        <span class="material-symbols-outlined fs-5">description</span> Descripción del Evento
+                    </h6>
+                    <div class="card border-0 shadow-sm rounded-3 mb-2">
+                        <div class="card-body p-4 bg-white rounded-3">
+                            <p class="text-secondary mb-0" id="detDescription" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-top-0 bg-light rounded-bottom-4">
+                    <button class="btn btn-secondary rounded-3 px-4" data-bs-dismiss="modal">Cerrar Reporte</button>
+                </div>
             </div>
         </div>
     </div>
