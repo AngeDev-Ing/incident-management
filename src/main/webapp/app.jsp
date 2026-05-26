@@ -81,14 +81,41 @@
         </button>
         <h5 class="fw-bolder text-dark mb-0 d-none d-md-block font-headline" id="pageTitle">Digital Sentinel</h5>
         <div class="position-relative">
-            <span class="material-symbols-outlined position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 1.1rem;">search</span>
-            <input type="text" class="form-control form-control-sm ps-4 rounded-pill bg-light border-0" placeholder="Buscar..." style="width: 250px;">
+
+            <span class="material-symbols-outlined position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"
+                style="font-size: 1.1rem;">
+                search
+            </span>
+
+            <input
+                type="text"
+                id="searchIncidencias"
+                class="form-control form-control-sm ps-4 rounded-pill bg-light border-0"
+                placeholder="Buscar incidencias..."
+                style="width: 250px;">
+
+            <div
+                id="searchSuggestions"
+                class="position-absolute bg-white shadow rounded-3 mt-2 d-none"
+                style="
+                    z-index:9999;
+                    width:350px;
+                    max-height:300px;
+                    overflow-y:auto;
+                    left:0;
+                ">
+            </div>
         </div>
     </div>
     <div class="d-flex align-items-center gap-3">
         <button class="btn btn-link text-secondary p-0 position-relative">
             <span class="material-symbols-outlined">notifications</span>
-            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none" style="width: 8px; height: 8px;"></span>
+            <span
+                id="notificationBadge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                style="font-size: 0.6rem;">
+                0
+            </span>
         </button>
         <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">settings</span></button>
         <button class="btn btn-link text-secondary p-0"><span class="material-symbols-outlined">account_circle</span></button>
@@ -113,5 +140,214 @@
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <!-- SPA Router -->
 <script src="/js/app.js"></script>
+<script>
+document.addEventListener("click", function (e) {
+    const btnEditar = e.target.closest(".btn-editar-incidencia");
+
+    if (!btnEditar) return;
+
+    setTimeout(function () {
+        document.getElementById("modalIncidenciaTitulo").innerText = "Editar Incidencia";
+        document.getElementById("textoBotonGuardarIncidencia").innerText = "Actualizar Incidencia";
+
+        document.getElementById("incidenciaId").value = btnEditar.dataset.id || "";
+        document.getElementById("title").value = btnEditar.dataset.title || "";
+        document.getElementById("description").value = btnEditar.dataset.description || "";
+        document.getElementById("date").value = btnEditar.dataset.date || "";
+        document.getElementById("time").value = btnEditar.dataset.time || "";
+        document.getElementById("type").value = btnEditar.dataset.type || "Robo";
+        document.getElementById("priority").value = btnEditar.dataset.priority || "Media";
+        document.getElementById("status").value = btnEditar.dataset.status || "Pendiente";
+    }, 500);
+});
+
+document.addEventListener("click", function (e) {
+    const btnNuevo = e.target.closest("[data-bs-target='#modalIncidencia']:not(.btn-editar-incidencia)");
+
+    if (!btnNuevo) return;
+
+    document.getElementById("modalIncidenciaTitulo").innerText = "Registrar Nueva Incidencia";
+    document.getElementById("textoBotonGuardarIncidencia").innerText = "Guardar Incidencia";
+
+    document.getElementById("incidenciaId").value = "";
+    document.getElementById("title").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("time").value = "";
+    document.getElementById("type").value = "Robo";
+    document.getElementById("priority").value = "Media";
+    document.getElementById("status").value = "Pendiente";
+});
+
+document.addEventListener("click", async function (e) {
+    const boton = e.target.closest("#btnGuardarIncidencia");
+
+    if (!boton) return;
+
+    const id = document.getElementById("incidenciaId").value;
+
+    const incidencia = {
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value,
+        type: document.getElementById("type").value,
+        priority: document.getElementById("priority").value,
+        status: document.getElementById("status").value
+    };
+
+    if (!incidencia.title || !incidencia.date || !incidencia.time) {
+        alert("Completa título, fecha y hora.");
+        return;
+    }
+
+    const url = id ? "/api/incidencias/" + id : "/api/incidencias";
+    const method = id ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(incidencia)
+    });
+
+    if (response.ok) {
+        alert(id ? "Incidencia actualizada correctamente" : "Incidencia registrada correctamente");
+
+        if (id) {
+            location.reload();
+        } else {
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalIncidencia"));
+            modal.hide();
+
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } else {
+        const error = await response.text();
+        console.error(error);
+        alert("Error al guardar incidencia");
+    }
+});
+
+document.addEventListener("click", async function (e) {
+    const btnEliminar = e.target.closest(".btn-eliminar-incidencia");
+
+    if (!btnEliminar) return;
+
+    const id = btnEliminar.dataset.id;
+
+    const confirmar = confirm("¿Eliminar esta incidencia?");
+
+    if (!confirmar) return;
+
+    const response = await fetch("/api/incidencias/" + id, {
+        method: "DELETE"
+    });
+
+    if (response.ok) {
+        alert("Incidencia eliminada correctamente");
+        location.reload();
+    } else {
+        const error = await response.text();
+        console.error(error);
+        alert("Error al eliminar incidencia");
+    }
+});
+document.addEventListener("input", async function (e) {
+    if (e.target.id !== "searchIncidencias") return;
+
+    const query = e.target.value.trim();
+    const contenedor = document.getElementById("searchSuggestions");
+
+    if (query.length < 2) {
+        contenedor.classList.add("d-none");
+        contenedor.innerHTML = "";
+        return;
+    }
+
+    const response = await fetch("/api/incidencias/search?query=" + encodeURIComponent(query));
+
+    if (!response.ok) {
+        contenedor.classList.add("d-none");
+        return;
+    }
+
+    const resultados = await response.json();
+    console.log(resultados);
+
+    if (resultados.length === 0) {
+        contenedor.innerHTML = `
+            <div class="p-3 text-muted small">
+                No se encontraron incidencias
+            </div>
+        `;
+        contenedor.classList.remove("d-none");
+        return;
+    }
+
+    contenedor.innerHTML = resultados.map(function(inc) {
+    return '<div class="p-3 border-bottom" style="cursor:pointer;">' +
+        '<strong class="text-dark">' + (inc.title || 'Sin título') + '</strong><br>' +
+        '<small class="text-muted">' +
+            (inc.type || 'Sin tipo') + ' - ' +
+            (inc.status || 'Sin estado') + ' - ' +
+            (inc.date || 'Sin fecha') +
+        '</small>' +
+    '</div>';
+}).join("");
+
+    contenedor.classList.remove("d-none");
+});
+let contadorNotificaciones = 0;
+
+function conectarWebSocket() {
+
+    const socket = new SockJS("/ws");
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+
+        console.log("WebSocket conectado");
+
+        stompClient.subscribe("/topic/notificaciones", function (message) {
+
+            const data = JSON.parse(message.body);
+
+            contadorNotificaciones++;
+
+            const badge = document.getElementById("notificationBadge");
+
+            if (badge) {
+                badge.classList.remove("d-none");
+                badge.innerText = contadorNotificaciones;
+                mostrarToastNotificacion(data.titulo, data.mensaje);
+            }
+
+            alert(
+                data.titulo + ": " + data.mensaje
+            );
+        });
+    });
+}
+function mostrarToastNotificacion(titulo, mensaje) {
+    const toast = document.createElement("div");
+
+    toast.className = "position-fixed top-0 end-0 m-4 p-3 bg-dark text-white rounded-4 shadow";
+    toast.style.zIndex = "99999";
+    toast.innerHTML =
+        "<strong>" + titulo + "</strong><br>" +
+        "<small>" + mensaje + "</small>";
+
+    document.body.appendChild(toast);
+
+    setTimeout(function () {
+        toast.remove();
+    }, 4000);
+}
+conectarWebSocket();
+</script>
 </body>
 </html>
