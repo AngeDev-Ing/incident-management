@@ -1,5 +1,7 @@
 package com.mycompany.incident.managment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "zonas")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Zona {
 
     @Id
@@ -28,6 +31,7 @@ public class Zona {
 
     /** Cámaras que pertenecen a esta zona */
     @OneToMany(mappedBy = "zona", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Camara> camaras;
 
     // ─── Constructors ────────────────────────────────────────────────────────
@@ -55,3 +59,4 @@ public class Zona {
     public List<Camara> getCamaras() { return camaras; }
     public void setCamaras(List<Camara> camaras) { this.camaras = camaras; }
 }
+

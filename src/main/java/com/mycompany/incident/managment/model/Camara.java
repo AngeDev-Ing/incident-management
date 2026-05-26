@@ -1,5 +1,6 @@
 package com.mycompany.incident.managment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 /**
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "camaras")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Camara {
 
     @Id
@@ -29,6 +31,7 @@ public class Camara {
     /** Zona geográfica a la que pertenece (FK → zonas) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "zona_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Zona zona;
 
     /** Modelo del dispositivo, ej: "Hikvision DS-2CD2143G2-I" */
@@ -83,3 +86,4 @@ public class Camara {
     public String getFechaInstalacion() { return fechaInstalacion; }
     public void setFechaInstalacion(String fechaInstalacion) { this.fechaInstalacion = fechaInstalacion; }
 }
+

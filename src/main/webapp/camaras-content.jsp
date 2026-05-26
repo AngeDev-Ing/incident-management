@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <main class="main-content p-4 w-100">
@@ -106,7 +106,7 @@
                         </c:when>
                         <c:otherwise>
                             <c:forEach var="cam" items="${camaras}" varStatus="loop">
-                                <div class="col-md-6 col-lg-3">
+                                <div class="col-md-6 col-lg-3 grid-cam-item" data-grid-id="${cam.id}">
                                     <div id="camFeed${loop.index}" class="cam-feed-wrapper position-relative rounded-3 overflow-hidden bg-black" style="aspect-ratio: 16/9;">
                                         
                                         <!-- Video / Feed -->
@@ -247,7 +247,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-4">
-        <form id="camaraForm">
+        <div id="camaraForm">
             <div class="mb-3">
                 <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">ID de Hardware</label>
                 <input type="text" class="form-control form-control-sm bg-light border-0 py-2" id="camId" name="id" placeholder="Ej: CAM-001" required>
@@ -284,8 +284,8 @@
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-dark w-100 fw-bold rounded-3 py-2">Guardar Datos</button>
-        </form>
+            <button type="button" class="btn btn-dark w-100 fw-bold rounded-3 py-2" id="btnGuardarCamara" onclick="window.submitCamaraForm(event)">Guardar Datos</button>
+        </div>
       </div>
     </div>
   </div>
@@ -394,6 +394,35 @@
             + '</td>';
     }
 
+    function buildGridHtml(id, name, location, status) {
+        var isOp = (status === 'Operativa');
+        var isMant = (status === 'Mantenimiento');
+        
+        var canvasHtml = isOp ? 
+            '<iframe src="https://www.youtube.com/embed/We1sryKsHm8?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=We1sryKsHm8&start=' + Math.floor(Math.random() * 500) + '&disablekb=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="w-100 h-100 position-absolute top-0 start-0" style="border:none; pointer-events:none; filter: grayscale(100%) contrast(1.3) brightness(0.8); transform: scale(1.3);"></iframe>' 
+
+            : '<canvas class="noSignalCanvas w-100 h-100 position-absolute top-0 start-0"></canvas><div class="text-center position-relative z-1 d-flex flex-column align-items-center justify-content-center h-100" style="pointer-events:none;"><span class="material-symbols-outlined text-secondary" style="font-size: 2rem;">videocam_off</span><div class="text-secondary fw-bold mt-1" style="font-size: 0.7rem;">SIN SEÑAL</div></div>';
+
+        var badgeHtml = isOp ? '<span class="badge bg-success rounded-pill px-2" style="font-size: 0.55rem;">OPERATIVA</span>' :
+                       (isMant ? '<span class="badge bg-warning text-dark rounded-pill px-2" style="font-size: 0.55rem;">MANT.</span>' :
+                       '<span class="badge bg-danger rounded-pill px-2" style="font-size: 0.55rem;">FALLO</span>');
+
+        var recHtml = isOp ? '<span class="badge bg-danger" style="font-size: 0.55rem; pointer-events:none;">● REC</span>' : '';
+
+        return '<div class="cam-feed-wrapper position-relative rounded-3 overflow-hidden bg-black" style="aspect-ratio: 16/9;">'
+             + canvasHtml
+             + '<div class="cam-overlay position-absolute bottom-0 start-0 w-100 p-2" style="background: linear-gradient(transparent, rgba(0,0,0,0.85)); pointer-events:none;">'
+             + '<div class="d-flex justify-content-between align-items-end">'
+             + '<div><div class="text-white fw-bold" style="font-size: 0.7rem;">' + id + ' · ' + name + '</div>'
+             + '<div class="text-secondary" style="font-size: 0.6rem;">' + location + '</div></div>'
+             + badgeHtml
+             + '</div></div>'
+             + '<div class="position-absolute top-0 end-0 p-1 d-flex gap-1">'
+             + recHtml
+             + '<button class="btn btn-sm btn-dark bg-opacity-50 p-0 px-1 border-0" title="Pantalla Completa"><span class="material-symbols-outlined text-white" style="font-size: 0.9rem;">fullscreen</span></button>'
+             + '</div></div>';
+    }
+
     function cerrarModal() {
         var modalEl = document.getElementById('camaraModal');
         if (modalEl) {
@@ -460,12 +489,19 @@
         fila.style.transform  = 'translateX(20px)';
         setTimeout(function() { if (fila.parentNode) fila.remove(); recalcularEstadisticas(); }, 260);
 
-        var params = new URLSearchParams();
-        params.append('id', id);
-        fetch('/api/camaras/eliminar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + getToken() },
-            body: params.toString()
+        var gridItem = document.querySelector('#cameraGrid .grid-cam-item[data-grid-id="' + id + '"]');
+        var gridSnapshot = null;
+        if (gridItem) {
+            gridSnapshot = gridItem.innerHTML;
+            gridItem.style.transition = 'opacity 0.25s,transform 0.25s';
+            gridItem.style.opacity = '0';
+            gridItem.style.transform = 'scale(0.9)';
+            setTimeout(function() { if (gridItem.parentNode) gridItem.remove(); }, 260);
+        }
+
+        fetch('/api/camaras/' + id, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + getToken() }
         })
         .then(function(res) {
             if (!res.ok) return res.text().then(function(t) { throw new Error(t || 'HTTP ' + res.status); });
@@ -487,9 +523,7 @@
     };
 
     function handleSubmit(e) {
-        if (!e.target || e.target.id !== 'camaraForm') return;
-        e.preventDefault();
-        e.stopPropagation();
+        if (e) e.preventDefault();
 
         var id        = document.getElementById('camId').value.trim();
         var name      = document.getElementById('camName').value.trim();
@@ -508,13 +542,14 @@
 
         cerrarModal();
 
-        var params = new URLSearchParams();
-        params.append('id', id);
-        params.append('name', name);
-        params.append('location', location);
-        params.append('status', status);
-        if (ip)     params.append('ipAddress', ip);
-        if (zonaId) params.append('zonaId', zonaId);
+        var payload = {
+            id: id,
+            name: name,
+            location: location,
+            status: status,
+            ipAddress: ip || null,
+            zonaId: zonaId || null
+        };
 
         var tbody = document.querySelector('#tablaCamaras tbody');
         if (!tbody) { console.error("[Camaras] No existe #tablaCamaras tbody"); return; }
@@ -533,16 +568,25 @@
             fila.innerHTML = buildRowHtml(id, name, ip, location, zonaId, status);
             recalcularEstadisticas();
 
-            console.log("[Camaras] POST edicion /api/camaras/guardar");
-            fetch('/api/camaras/guardar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + getToken() },
-                body: params.toString()
+            var gridItem = document.querySelector('#cameraGrid .grid-cam-item[data-grid-id="' + id + '"]');
+            var gridSnapHTML = null;
+            if (gridItem) {
+                gridSnapHTML = gridItem.innerHTML;
+                gridItem.innerHTML = buildGridHtml(id, name, location, status);
+                gridItem.classList.add('cam-row-saving');
+            }
+
+            console.log("[Camaras] PUT edicion /api/camaras/" + id);
+            fetch('/api/camaras/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+                body: JSON.stringify(payload)
             })
             .then(function(res) {
                 if (!res.ok) return res.text().then(function(t) { throw new Error(t || 'HTTP ' + res.status); });
                 console.log("[Camaras] Edicion OK en BD.");
                 fila.classList.remove('cam-row-saving');
+                if (gridItem) gridItem.classList.remove('cam-row-saving');
             })
             .catch(function(err) {
                 console.error("[Camaras] Fallo edicion, revirtiendo:", err);
@@ -566,16 +610,28 @@
             tbody.appendChild(nuevaFila);
             recalcularEstadisticas();
 
-            console.log("[Camaras] POST insercion /api/camaras/guardar");
-            fetch('/api/camaras/guardar', {
+            var gridCont = document.getElementById('cameraGrid');
+            var emptyGrid = gridCont.querySelector('.col-12.text-center');
+            if (emptyGrid) emptyGrid.remove();
+            
+            var newGridItem = document.createElement('div');
+            newGridItem.className = 'col-md-6 col-lg-3 grid-cam-item cam-row-saving';
+            newGridItem.setAttribute('data-grid-id', id);
+            newGridItem.style.animation = 'fadeInRow 0.3s ease';
+            newGridItem.innerHTML = buildGridHtml(id, name, location, status);
+            gridCont.appendChild(newGridItem);
+
+            console.log("[Camaras] POST insercion /api/camaras");
+            fetch('/api/camaras', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + getToken() },
-                body: params.toString()
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+                body: JSON.stringify(payload)
             })
             .then(function(res) {
                 if (!res.ok) return res.text().then(function(t) { throw new Error(t || 'HTTP ' + res.status); });
                 console.log("[Camaras] Insercion OK en BD.");
                 nuevaFila.classList.remove('cam-row-saving');
+                newGridItem.classList.remove('cam-row-saving');
             })
             .catch(function(err) {
                 console.error("[Camaras] Fallo insercion, revirtiendo:", err);
@@ -595,12 +651,9 @@
         }
     }
 
-    if (window._camaraSubmitHandler) {
-        document.removeEventListener('submit', window._camaraSubmitHandler, true);
-    }
-    window._camaraSubmitHandler = handleSubmit;
-    document.addEventListener('submit', window._camaraSubmitHandler, true);
-    console.log("[Camaras] Listener submit registrado.");
+    // Asignar al contexto global para que el onsubmit del HTML pueda acceder
+    window.submitCamaraForm = handleSubmit;
+    console.log("[Camaras] window.submitCamaraForm registrado globalmente.");
 
     window.currentCamIndex = 0;
     window.currentLayout   = 'grid';
@@ -639,19 +692,33 @@
         var cols = document.querySelectorAll('#cameraGrid > div');
         var prevBtn = document.getElementById('prevCamBtn');
         var nextBtn = document.getElementById('nextCamBtn');
+        
         if (window.currentLayout === 'grid') {
-            if (prevBtn) prevBtn.classList.replace('d-block','d-none');
-            if (nextBtn) nextBtn.classList.replace('d-block','d-none');
-            cols.forEach(function(col) {
-                col.className = 'col-6 p-1'; col.style.display = 'block'; col.style.height = '50%';
-                var fw = col.querySelector('.cam-feed-wrapper'); if (fw) fw.style.height = '100%';
+            var showArrows = cols.length > 4;
+            if (prevBtn) { prevBtn.classList.remove(showArrows ? 'd-none' : 'd-block'); prevBtn.classList.add(showArrows ? 'd-block' : 'd-none'); }
+            if (nextBtn) { nextBtn.classList.remove(showArrows ? 'd-none' : 'd-block'); nextBtn.classList.add(showArrows ? 'd-block' : 'd-none'); }
+            
+            var pageStart = Math.floor(window.currentCamIndex / 4) * 4;
+            
+            cols.forEach(function(col, idx) {
+                if (idx >= pageStart && idx < pageStart + 4) {
+                    col.className = 'col-6 p-1 grid-cam-item'; 
+                    col.style.display = 'block'; 
+                    col.style.height = '50%';
+                    var fw = col.querySelector('.cam-feed-wrapper'); 
+                    if (fw) fw.style.height = '100%';
+                } else {
+                    col.style.display = 'none';
+                }
             });
         } else {
-            if (prevBtn) prevBtn.classList.replace('d-none','d-block');
-            if (nextBtn) nextBtn.classList.replace('d-none','d-block');
+            var showArrows = cols.length > 1;
+            if (prevBtn) { prevBtn.classList.remove(showArrows ? 'd-none' : 'd-block'); prevBtn.classList.add(showArrows ? 'd-block' : 'd-none'); }
+            if (nextBtn) { nextBtn.classList.remove(showArrows ? 'd-none' : 'd-block'); nextBtn.classList.add(showArrows ? 'd-block' : 'd-none'); }
+            
             cols.forEach(function(col, idx) {
                 if (idx === window.currentCamIndex) {
-                    col.className = 'col-12 p-1'; col.style.display = 'block'; col.style.height = '100%';
+                    col.className = 'col-12 p-1 grid-cam-item'; col.style.display = 'block'; col.style.height = '100%';
                     var fw = col.querySelector('.cam-feed-wrapper'); if (fw) fw.style.height = '100%';
                 } else { col.style.display = 'none'; }
             });
@@ -661,17 +728,35 @@
     window.resetLayout = function() {
         var cols = document.querySelectorAll('#cameraGrid > div');
         var prevBtn = document.getElementById('prevCamBtn'); var nextBtn = document.getElementById('nextCamBtn');
-        if (prevBtn) prevBtn.classList.replace('d-block','d-none');
-        if (nextBtn) nextBtn.classList.replace('d-block','d-none');
+        if (prevBtn) { prevBtn.classList.remove('d-block'); prevBtn.classList.add('d-none'); }
+        if (nextBtn) { nextBtn.classList.remove('d-block'); nextBtn.classList.add('d-none'); }
         cols.forEach(function(col) {
-            col.className = 'col-md-6 col-lg-3'; col.style.display = 'block'; col.style.height = 'auto';
+            col.className = 'col-md-6 col-lg-3 grid-cam-item'; col.style.display = 'block'; col.style.height = 'auto';
             var fw = col.querySelector('.cam-feed-wrapper'); if (fw) fw.style.height = '';
         });
     };
 
     window.setLayout = function(l) { window.currentLayout = l; window.applyLayout(); };
-    window.nextCam   = function() { var c = document.querySelectorAll('#cameraGrid > div'); window.currentCamIndex = (window.currentCamIndex + 1) % c.length; window.applyLayout(); };
-    window.prevCam   = function() { var c = document.querySelectorAll('#cameraGrid > div'); window.currentCamIndex = (window.currentCamIndex - 1 + c.length) % c.length; window.applyLayout(); };
+    window.nextCam = function() { 
+        var c = document.querySelectorAll('#cameraGrid > div'); if (!c.length) return;
+        if (window.currentLayout === 'grid') {
+            window.currentCamIndex += 4;
+            if (window.currentCamIndex >= c.length) window.currentCamIndex = 0;
+        } else {
+            window.currentCamIndex = (window.currentCamIndex + 1) % c.length; 
+        }
+        window.applyLayout(); 
+    };
+    window.prevCam = function() { 
+        var c = document.querySelectorAll('#cameraGrid > div'); if (!c.length) return;
+        if (window.currentLayout === 'grid') {
+            window.currentCamIndex -= 4;
+            if (window.currentCamIndex < 0) window.currentCamIndex = Math.floor((c.length - 1) / 4) * 4;
+        } else {
+            window.currentCamIndex = (window.currentCamIndex - 1 + c.length) % c.length; 
+        }
+        window.applyLayout(); 
+    };
     window.exitSurveillanceMode = function() { if (document.exitFullscreen) document.exitFullscreen(); };
 
     if (window.liveTimeInterval) clearInterval(window.liveTimeInterval);

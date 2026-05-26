@@ -95,15 +95,11 @@ window.eliminarCamara = function(id) {
     recalcularEstadisticas();
 
     // 3. Llamar a la BD en background
-    const formData = new URLSearchParams();
-    formData.append('id', id);
-    fetch('/api/camaras/eliminar', {
-        method: 'POST',
+    fetch('/api/camaras/' + id, {
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // FIX: Usando la misma key de app.js
-        },
-        body: formData
+            'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
+        }
     })
     .then(res => {
         if (!res.ok) throw new Error(`Error del servidor (${res.status})`);
@@ -180,13 +176,14 @@ document.addEventListener('submit', function(e) {
         const esEdicion = document.getElementById('camId').readOnly;
 
         // Construir params para el fetch
-        const params = new URLSearchParams();
-        params.append('id', id);
-        params.append('name', name);
-        params.append('location', location);
-        params.append('status', status);
-        if (ip) params.append('ipAddress', ip);
-        if (zonaId) params.append('zonaId', zonaId);
+        const payload = {
+            id: id,
+            name: name,
+            location: location,
+            status: status,
+            ipAddress: ip || null,
+            zonaId: zonaId || null
+        };
 
         const modalEl = document.getElementById('camaraModal');
         if (modalEl) {
@@ -234,10 +231,10 @@ document.addEventListener('submit', function(e) {
             recalcularEstadisticas();
 
             // 2. Sincronizar con BD en background
-            fetch('/api/camaras/guardar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') },
-                body: params
+            fetch('/api/camaras/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') },
+                body: JSON.stringify(payload)
             })
             .then(res => res.text().then(txt => { if (!res.ok) throw new Error(txt || `Error ${res.status}`); }))
             .then(() => {
@@ -284,10 +281,10 @@ document.addEventListener('submit', function(e) {
             recalcularEstadisticas();
 
             // 3. Sincronizar con BD en background
-            fetch('/api/camaras/guardar', {
+            fetch('/api/camaras', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') },
-                body: params
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') },
+                body: JSON.stringify(payload)
             })
             .then(res => res.text().then(txt => { if (!res.ok) throw new Error(txt || `Error ${res.status}`); }))
             .then(() => {
